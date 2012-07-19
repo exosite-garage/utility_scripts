@@ -44,7 +44,7 @@ More Information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Exosite API -> http://exosite.com/api
 
-**Notes**
+**Notes**:
 ***Support***:
 * Email: support@exosite.com (reference the script you are using, etc)
 * Web: https://support.exosite.com (forums, knowledge base, ticket system)

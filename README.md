@@ -16,6 +16,11 @@ License is BSD, Copyright 2012, Exosite LLC (see LICENSE file)
 Python Scripts: Built/tested with Python 2.7 or will specifically call 
 out the version in the script notes.
 
+We try to make these scripts / examples stand-alone but make notes if not.
+
+Scripts may require certain modules / libraries to be installed, and are noted 
+as best possible.
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Quick Start
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,6 +45,6 @@ More Information
 * Exosite API -> http://exosite.com/api
 
 **Notes**
-* Support:
-** Email: support@exosite.com (reference the script you are using, etc)
-** Web: https://support.exosite.com (forums, knowledge base, ticket system)
+***Support***:
+* Email: support@exosite.com (reference the script you are using, etc)
+* Web: https://support.exosite.com (forums, knowledge base, ticket system)

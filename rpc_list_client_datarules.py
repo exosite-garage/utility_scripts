@@ -109,26 +109,31 @@ for o in currentDatarules:
     s.send('Content-Length: '+ str(len(body)) +'\r\n\r\n')
     s.send(body)
 
-    data = s.recv(1024)
+    print '\r\n\r\n:DataRule:'
+    data = s.recv(4096)  #make big enough to handle datarules that are scripts
     #print 'Received Http Packet: \r\n', str(data)
     response = data.split('\r\n\r\n')
     #print 'Response Message:', response[1]
-
-    objs = json.loads(response[1])
+    
     try:
-        
-        rid = str(o)
-        name = str(objs[0]["result"]["description"]["name"])
-        if any (k in objs[0]["result"]["description"]["rule"] for k in ("duration","interval","timeout","count")):
-            ruletype = 'logic'
-        elif "script" in objs[0]["result"]["description"]["rule"]:
-            ruletype = 'script'
-        else:
-            ruletype = 'unknown'
-        DataRuleList.append(ExositeEvent(rid,name,ruletype))
-        print 'Event (RID:',o,') Name:',name,', [Type:',ruletype,']'
+        objs = json.loads(response[1])
+        try:
+            
+            rid = str(o)
+            name = str(objs[0]["result"]["description"]["name"])
+            if any (k in objs[0]["result"]["description"]["rule"] for k in ("duration","interval","timeout","count")):
+                ruletype = 'logic'
+            elif "script" in objs[0]["result"]["description"]["rule"]:
+                ruletype = 'script'
+            else:
+                ruletype = 'unknown'
+            DataRuleList.append(ExositeEvent(rid,name,ruletype))
+            print 'DataRule Info: (RID:',o,') Name:',name,', [Type:',ruletype,']'
+        except:
+            print 'Exception creating array of Events'
     except:
-        print 'Exception creating array of Events'
+        print 'Exception converting into JSON object, check receive buffer size or datarule has some creation error'
+    print 'DataRule One Platform -> Full Description:\r\n', response[1] #comment this out if you don't want to see full OneP description
 print ''
 #
 # Now find state of event

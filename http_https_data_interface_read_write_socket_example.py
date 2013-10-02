@@ -57,10 +57,10 @@
 import socket
 import sys
 import ssl
-
+import urllib
+import time
 
 cik = 'PUTYOURCIKHERE'
-host = 'm2.exosite.com'
 
 
 print '========================================================================'
@@ -68,71 +68,94 @@ print 'HTTP REST API DEMO. Using CIK ', cik
 print '========================================================================'
 print '\r\n'
 
-http_port = 80
-url = '/api:v1/stack/alias' 
-params = 'message=hello world!&number=1'  #Dataport have alias 'message' and 'number'
-headers = {'X-Exosite-CIK': cik, 'content-type': 'application/x-www-form-urlencoded; charset=utf-8'}
-
-
 print '=================='
-print 'POST'
+print 'POST - HTTP'
 print '=================='
-print 'Server:', host
-print 'Port:', http_port
-print 'URL:', url
-print 'Data:', params
-print ' '
 
+postparams = 'message=hello world!&number=1'  #Dataports have alias's 'message' and 'number'
+postparams = urllib.quote(postparams,safe='=&?') #Python specific to encode the content params
+content = postparams
+
+# Note: This example is building a large string to send over the socket, this could be done
+# instead line by line.  For purposes of printing out the request, it is done this way.
+
+request_packet = ''
+request_packet += 'POST /api:v1/stack/alias HTTP/1.1\r\n'
+request_packet += 'Host: m2.exosite.com\r\n'
+request_packet += 'X-Exosite-CIK: '+cik+'\r\n'
+request_packet += 'Connection: Close \r\n'
+request_packet += 'Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n'
+request_packet += 'Content-Length: '+ str(len(content)) +'\r\n'
+request_packet += '\r\n'
+request_packet += content # Must be same size as Content-Length specified
+
+print '--REQUEST:-----------------------'
+print str(request_packet)
+print '---------------------------------'
+
+# OPEN SOCKET
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((host, http_port))
-s.send('POST '+url+' HTTP/1.1\r\n')
-s.send('Host: '+host+'\r\n')
-s.send('X-Exosite-CIK: '+cik+'\r\n')
-s.send('Connection: Close \r\n')
-s.send('Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n')
-body = params
-s.send('Content-Length: '+ str(len(body)) +'\r\n\r\n')
-s.send(body)
-
-data = s.recv(1024)
+s.connect(('m2.exosite.com', 80))
+# SEND REQUEST
+s.send(request_packet)
+# RECEIVE RESPONSE
+data = s.recv(2048)
+# CLOSE SOCKET
 s.close()
-print 'Received: \r\n', str(data)
-print '(Note: You should see a response of "HTTP/1.1 204 No Content" if this works correctly)'
 
+# URL DECODE - If required
+data = urllib.unquote_plus(data) # library specific to python
+print '--RESPONSE:----------------------'
+print str(data),
+print '---------------------------------'
+print '(Note: You should see a response of "HTTP/1.1 204 No Content" if this works correctly)'
 print '\r\n\r\n'
 
 
-params = '?message&number'
-url = '/api:v1/stack/alias' + params
-
-
 print '=================='
-print 'GET'
+print 'GET - HTTP'
 print '=================='
-print 'Server:', host
-print 'Port:',http_port
-print 'URL:',url
-print 'Data to get:', params
-print ' '
 
+getparams = '?message&number' # Get dataports with alias's 'message' and 'number'
+getparams = urllib.quote(getparams,safe='=&?') #Python specific to encode the url params
+
+# Note: This example is building a large string to send over the socket, this could be done
+# instead line by line.  For purposes of printing out the request, it is done this way.
+
+request_packet = ''
+request_packet += 'GET /api:v1/stack/alias' + getparams +' HTTP/1.1\r\n'
+request_packet += 'Host: m2.exosite.com\r\n'
+request_packet += 'X-Exosite-CIK: '+cik+'\r\n'
+request_packet += 'Connection: Close\r\n'
+request_packet += 'Accept: application/x-www-form-urlencoded; charset=utf-8\r\n'
+request_packet += '\r\n' # Must have blank line
+
+print '--REQUEST:-----------------------'
+print str(request_packet),
+print '---------------------------------'
+
+# OPEN SOCKET
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((host, http_port))
-s.send('GET '+url+' HTTP/1.1\r\n')
-s.send('Host: '+host+'\r\n')
-s.send('X-Exosite-CIK: '+cik+'\r\n')
-s.send('Connection: Close \r\n')
-s.send('Accept: application/x-www-form-urlencoded; charset=utf-8\r\n')
-s.send('\r\n')
+s.connect(('m2.exosite.com', 80))
+# SEND REQUEST
+s.send(request_packet)
+# RECEIVE RESPONSE
 data = s.recv(1024)
+# CLOSE SOCKET
 s.close()
-print 'Received: \r\n', str(data)
+
+# URL DECODE - If required
+data = urllib.unquote_plus(data) # library specific to python
+print '--RESPONSE:----------------------'
+print str(data)
+print '---------------------------------'
 print '(Note: You should see a response of "HTTP/1.1 200 OK" if this works correctly)'
 print '(Note: Some string data in the response may need formating, it is urlencoded)'
-
 print '\r\n\r\n'
 
-print '\r\n'
-print '\r\n'
+
+time.sleep(1) # make sure 1 second before writing to the data sources
+
 
 
 print '========================================================================'
@@ -140,71 +163,90 @@ print 'HTTPS REST API DEMO. Using CIK ', cik
 print '========================================================================'
 print '\r\n'
 
-https_port = 443
-url = '/api:v1/stack/alias' 
-params = 'message=hello world!&number=1'  #Dataport have alias 'message' and 'number'
-headers = {'X-Exosite-CIK': cik, 'content-type': 'application/x-www-form-urlencoded; charset=utf-8'}
-
-
 print '=================='
-print 'POST'
+print 'POST - HTTPS'
 print '=================='
-print 'Server:', host
-print 'Port:', https_port
-print 'URL:', url
-print 'Data:', params
-print ' '
 
+postparams = 'message=hello world!&number=1'  #Dataports have alias's 'message' and 'number'
+postparams = urllib.quote(postparams,safe='=&?') #Python specific to encode the content params
+content = postparams
+
+# Note: This example is building a large string to send over the socket, this could be done
+# instead line by line.  For purposes of printing out the request, it is done this way.
+
+request_packet = ''
+request_packet += 'POST /api:v1/stack/alias HTTP/1.1\r\n'
+request_packet += 'Host: m2.exosite.com\r\n'
+request_packet += 'X-Exosite-CIK: '+cik+'\r\n'
+request_packet += 'Connection: Close \r\n'
+request_packet += 'Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n'
+request_packet += 'Content-Length: '+ str(len(content)) +'\r\n'
+request_packet += '\r\n'
+request_packet += content # Must be same size as Content-Length specified
+
+print '--REQUEST:-----------------------'
+print str(request_packet)
+print '---------------------------------'
+
+# OPEN SOCKET
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ssl_s = ssl.wrap_socket(s)
-
-ssl_s.connect((host, https_port))
-ssl_s.send('POST '+url+' HTTP/1.1\r\n')
-ssl_s.send('Host: '+host+'\r\n')
-ssl_s.send('X-Exosite-CIK: '+cik+'\r\n')
-ssl_s.send('Connection: Close \r\n')
-ssl_s.send('Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n')
-body = params
-ssl_s.send('Content-Length: '+ str(len(body)) +'\r\n\r\n')
-ssl_s.send(body)
-
+ssl_s.connect(('m2.exosite.com', 443))
+# SEND REQUEST
+ssl_s.send(request_packet)
+# RECEIVE RESPONSE
 data = ssl_s.recv(1024)
+# CLOSE SOCKET
 ssl_s.close()
-print 'Received: \r\n', str(data)
-print '(Note: You should see a response of "HTTP/1.1 204 No Content" if this works correctly)'
 
+# URL DECODE - If required
+data = urllib.unquote_plus(data) # library specific to python
+print '--RESPONSE:----------------------'
+print str(data),
+print '---------------------------------'
+print '(Note: You should see a response of "HTTP/1.1 204 No Content" if this works correctly)'
 print '\r\n\r\n'
 
 
-params = '?message&number'
-url = '/api:v1/stack/alias' + params
 
 
 print '=================='
-print 'GET'
+print 'GET - HTTPS'
 print '=================='
-print 'Server:', host
-print 'Port:',https_port
-print 'URL:',url
-print 'Data to get:', params
-print ' '
+getparams = '?message&number' # Get dataports with alias's 'message' and 'number'
+getparams = urllib.quote(getparams,safe='=&?') #Python specific to encode the url params
 
+# Note: This example is building a large string to send over the socket, this could be done
+# instead line by line.  For purposes of printing out the request, it is done this way.
+
+request_packet = ''
+request_packet += 'GET /api:v1/stack/alias' + getparams +' HTTP/1.1\r\n'
+request_packet += 'Host: m2.exosite.com\r\n'
+request_packet += 'X-Exosite-CIK: '+cik+'\r\n'
+request_packet += 'Connection: Close\r\n'
+request_packet += 'Accept: application/x-www-form-urlencoded; charset=utf-8\r\n'
+request_packet += '\r\n' # Must have blank line
+
+print '--REQUEST:-----------------------'
+print str(request_packet),
+print '---------------------------------'
+
+# OPEN SOCKET
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ssl_s = ssl.wrap_socket(s)
-ssl_s.connect((host, https_port))
-ssl_s.send('GET '+url+' HTTP/1.1\r\n')
-ssl_s.send('Host: '+host+'\r\n')
-ssl_s.send('X-Exosite-CIK: '+cik+'\r\n')
-ssl_s.send('Connection: Close \r\n')
-ssl_s.send('Accept: application/x-www-form-urlencoded; charset=utf-8\r\n')
-ssl_s.send('\r\n')
+ssl_s.connect(('m2.exosite.com', 443))
+# SEND REQUEST
+ssl_s.send(request_packet)
+# RECEIVE RESPONSE
 data = ssl_s.recv(1024)
+# CLOSE SOCKET
 ssl_s.close()
-print 'Received: \r\n', str(data)
+
+# URL DECODE - If required
+data = urllib.unquote_plus(data) # library specific to python
+print '--RESPONSE:----------------------'
+print str(data)
+print '---------------------------------'
 print '(Note: You should see a response of "HTTP/1.1 200 OK" if this works correctly)'
 print '(Note: Some string data in the response may need formating, it is urlencoded)'
-
 print '\r\n\r\n'
-
-print '\r\n'
-print '\r\n'

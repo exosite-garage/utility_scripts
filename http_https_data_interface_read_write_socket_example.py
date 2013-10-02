@@ -86,7 +86,7 @@ request_packet += 'X-Exosite-CIK: '+cik+'\r\n'
 request_packet += 'Connection: Close \r\n'
 request_packet += 'Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n'
 request_packet += 'Content-Length: '+ str(len(content)) +'\r\n'
-request_packet += '\r\n'
+request_packet += '\r\n' # Must have blank line here
 request_packet += content # Must be same size as Content-Length specified
 
 print '--REQUEST:-----------------------'
@@ -181,7 +181,7 @@ request_packet += 'X-Exosite-CIK: '+cik+'\r\n'
 request_packet += 'Connection: Close \r\n'
 request_packet += 'Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n'
 request_packet += 'Content-Length: '+ str(len(content)) +'\r\n'
-request_packet += '\r\n'
+request_packet += '\r\n' # Must have blank line here
 request_packet += content # Must be same size as Content-Length specified
 
 print '--REQUEST:-----------------------'
